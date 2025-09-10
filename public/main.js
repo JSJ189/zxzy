@@ -12,7 +12,8 @@ const tabButtons = document.querySelectorAll('.tab-btn');
 const promptButtons = document.querySelectorAll('.prompt-btn');
 
 let abortController = new AbortController();
-let currentMode = 'chat'; // 新增：当前模式变量
+// **核心逻辑**：用于跟踪当前模式，默认为'chat'
+let currentMode = 'chat'; 
 
 // --- Event Listeners ---
 
@@ -43,19 +44,20 @@ mainMessageInput.addEventListener('input', () => {
     mainMessageInput.style.height = (mainMessageInput.scrollHeight) + 'px';
 });
 
-// 标签页切换 - 修复模式切换逻辑
+// **核心逻辑**：标签页切换，更新 currentMode
 tabButtons.forEach(button => {
     button.addEventListener('click', () => {
         tabButtons.forEach(btn => btn.classList.remove('tab-active'));
         button.classList.add('tab-active');
         
-        // 关键修复：正确设置当前模式
         const buttonText = button.textContent.trim();
+        // 根据按钮文本设置模式
         if (buttonText === '照片创作') {
             currentMode = 'image';
         } else {
             currentMode = 'chat';
         }
+        console.log(`模式已切换为: ${currentMode}`);
         
         // 更新占位符
         const placeholderMap = {
@@ -85,7 +87,7 @@ stopButton.addEventListener('click', () => {
 
 // --- 核心函数 ---
 
-// 修复：根据当前模式处理消息
+// **核心逻辑**：根据 currentMode 决定调用哪个API
 function handleNewMessage(message) {
     if (initialView.style.display !== 'none') {
         initialView.style.display = 'none';
@@ -93,7 +95,7 @@ function handleNewMessage(message) {
     }
     appendMessage(message, 'user');
     
-    // 关键修复：根据当前模式调用不同函数
+    // 根据当前模式调用不同的后端接口
     if (currentMode === 'image') {
         generateImage(message);
     } else {
@@ -117,23 +119,21 @@ function fetchAIResponse(message) {
         signal,
     })
     .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP 错误! 状态: ${response.status}`);
         processStream(response.body, contentElement);
     })
     .catch(error => {
         if (error.name !== 'AbortError') {
-            console.error('Error during chat processing:', error);
+            console.error('聊天处理出错:', error);
             contentElement.innerHTML = "抱歉，连接服务器时发生错误。";
         }
         toggleButtons(false);
     });
 }
 
-// 新增：图像生成功能
+// 图像生成功能
 function generateImage(prompt) {
     toggleButtons(true);
-    abortController = new AbortController();
-    const signal = abortController.signal;
 
     const aiMessageWrapper = appendMessage('<div class="image-loading">正在生成图像...</div>', 'ai');
     const contentElement = aiMessageWrapper.querySelector('.message-content');
@@ -142,19 +142,27 @@ function generateImage(prompt) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
-        signal,
     })
     .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        processImageStream(response.body, contentElement);
+        if (!response.ok) {
+           return response.json().then(err => { throw new Error(`HTTP 错误: ${response.status} - ${err.details || err.error}`) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.data && data.data[0] && data.data[0].url) {
+            const imageUrl = data.data[0].url;
+            contentElement.innerHTML = `<img src="${imageUrl}" alt="生成的图像" class="generated-image">`;
+        } else {
+            contentElement.innerHTML = "抱歉，未能从API获取有效图像链接。";
+        }
+        scrollToBottom();
     })
     .catch(error => {
-        if (error.name === 'AbortError') {
-            contentElement.innerHTML = "图像生成已被取消";
-        } else {
-            console.error('Error during image generation:', error);
-            contentElement.innerHTML = "抱歉，生成图像时发生错误。";
-        }
+        console.error('图像生成出错:', error);
+        contentElement.innerHTML = `抱歉，生成图像时发生错误。<br><span class="text-xs text-gray-500">${error.message}</span>`;
+    })
+    .finally(() => {
         toggleButtons(false);
     });
 }
@@ -190,7 +198,7 @@ async function processStream(stream, contentElement) {
             scrollToBottom();
         }
     } catch (error) {
-        console.error("Error reading stream:", error);
+        console.error("读取数据流时发生错误:", error);
         contentElement.textContent = "读取数据流时发生错误。";
     } finally {
         finalizeMessage(contentElement);
@@ -198,60 +206,18 @@ async function processStream(stream, contentElement) {
     }
 }
 
-// 新增：图像流处理
-async function processImageStream(stream, contentElement) {
-    const reader = stream.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let images = [];
 
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n');
-            
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.substring(6);
-                    if (data === '[DONE]') continue;
-                    
-                    try {
-                        const parsed = JSON.parse(data);
-                        if (parsed.data && parsed.data.length > 0) {
-                            images = [...images, ...parsed.data];
-                            
-                            // 显示生成的图片
-                            let html = '';
-                            images.forEach(img => {
-                                html += `<div class="generated-image-container">
-                                          <img src="${img.url}" alt="生成的图像" class="generated-image">
-                                       </div>`;
-                            });
-                            contentElement.innerHTML = html;
-                            scrollToBottom();
-                        }
-                    } catch (e) {
-                        console.error("解析图像流错误:", e);
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.error("读取图像流错误:", error);
-        contentElement.innerHTML = "读取图像数据时发生错误。";
-    } finally {
-        toggleButtons(false);
-    }
-}
-
-// 其他函数保持不变...
+// --- 辅助函数 ---
 function appendMessage(content, sender) {
     const messageWrapper = document.createElement('div');
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
-    contentElement.innerHTML = marked.parse(content);
+    // 对于用户消息，我们不进行markdown解析，以避免意外的格式化
+    if (sender === 'user') {
+        contentElement.textContent = content;
+    } else {
+        contentElement.innerHTML = marked.parse(content);
+    }
 
     if (sender === 'user') {
         messageWrapper.className = 'w-full flex justify-end';
@@ -306,3 +272,4 @@ function scrollToBottom() {
 const script = document.createElement('script');
 script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
 document.head.appendChild(script);
+
