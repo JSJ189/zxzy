@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>壮新智语 - 开启你的专属AI之旅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', 'Arial', 'sans-serif';
+            background-color: #f7f8fa;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a3aab5; }
+        .blinking-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background-color: #333;
+            animation: blink 1s step-end infinite;
+            vertical-align: bottom;
+        }
+        @keyframes blink { 50% { background-color: transparent; } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .tab-active {
+            background-color: white;
+            color: #4f46e5;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+    <div class="flex flex-col items-center w-full min-h-screen pt-8 pb-32 px-4">
+        <!-- 页眉和Logo -->
+        <header class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M50 0C22.386 0 0 22.386 0 50C0 77.614 22.386 100 50 100C77.614 100 100 77.614 100 50C100 22.386 77.614 0 50 0ZM50 88C28.925 88 12 71.075 12 50C12 28.925 28.925 12 50 12C71.075 12 88 28.925 88 50C88 71.075 71.075 88 50 88Z" fill="url(#paint0_linear_88_3)"/>
+                    <path d="M50 78C34.536 78 22 65.464 22 50C22 34.536 34.536 22 50 22C65.464 22 78 34.536 78 50C78 65.464 65.464 78 50 78Z" fill="url(#paint1_linear_88_3)"/>
+                    <defs>
+                        <linearGradient id="paint0_linear_88_3" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#8B5CF6"/>
+                            <stop offset="1" stop-color="#EC4899"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_88_3" x1="22" y1="22" x2="78" y2="78" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#A78BFA"/>
+                            <stop offset="1" stop-color="#F472B6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-700">壮新智语</h1>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="w-full flex flex-col items-center flex-1 max-w-3xl">
+            <!-- 初始视图 -->
+            <div id="initial-view" class="w-full text-center animate-fade-in">
+                <h2 class="text-4xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">开启你的专属AI之旅</h2>
+                <p class="text-gray-500 mb-8">让AI为你的创造无限可能，从旅游规划到设计创作，一切尽在掌握</p>
+
+                <!-- 主要输入卡片 -->
+                <div class="bg-white/80 p-2 rounded-2xl shadow-lg border w-full max-w-3xl mx-auto backdrop-blur-sm">
+                    <!-- 标签页 -->
+                    <div class="flex items-center bg-gray-100 rounded-xl p-1 mb-2">
+                        <button class="tab-btn flex-1 p-2 rounded-lg transition-all duration-300 tab-active">旅游规划</button>
+                        <button class="tab-btn flex-1 p-2 rounded-lg transition-all duration-300">设计商品</button>
+                        <button class="tab-btn flex-1 p-2 rounded-lg transition-all duration-300">照片创作</button>
+                    </div>
+                    <!-- 初始输入表单 -->
+                    <form id="initial-chat-form" class="relative w-full">
+                        <textarea id="initial-message-input" class="w-full h-24 p-4 text-base text-gray-800 bg-transparent focus:outline-none resize-none" placeholder="输入你的想法，让AI为你创造..." rows="3"></textarea>
+                        <button type="submit" class="absolute bottom-3 right-3 w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:from-gray-400 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                        </button>
+                    </form>
+                </div>
+                <!-- 快捷指令 -->
+                <div class="flex justify-center space-x-4 my-6">
+                    <button class="prompt-btn bg-fuchsia-100 text-fuchsia-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-fuchsia-200 transition">社媒服饰写真</button>
+                    <button class="prompt-btn bg-sky-100 text-sky-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-sky-200 transition">旅游大片设计</button>
+                    <button class="prompt-btn bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-emerald-200 transition">定制文旅产品</button>
+                </div>
+                <!-- 精彩案例 -->
+                <h3 class="text-lg font-bold text-gray-600 mb-4">精彩创作案例</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Card 1: 民族服饰 -->
+                    <div class="relative p-6 rounded-2xl text-left h-48 flex flex-col justify-end text-white overflow-hidden shadow-lg" 
+                         style="background-image: url('壮族服饰.webp'); background-size: cover; background-position: center;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="relative z-10">
+                            <h4 class="text-xl font-bold">民族服饰</h4>
+                            <p class="text-sm">传统与现代的时尚交融</p>
+                        </div>
+                    </div>
+                    <!-- Card 2: 数字油画 -->
+                    <div class="relative p-6 rounded-2xl text-left h-48 flex flex-col justify-end text-white overflow-hidden shadow-lg" 
+                         style="background-image: url('油画.webp'); background-size: cover; background-position: center;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="relative z-10">
+                            <h4 class="text-xl font-bold">数字油画</h4>
+                            <p class="text-sm">AI生成的古典艺术之美</p>
+                        </div>
+                    </div>
+                    <!-- Card 3: 影视概念 -->
+                    <div class="relative p-6 rounded-2xl text-left h-48 flex flex-col justify-end text-white overflow-hidden shadow-lg" 
+                         style="background-image: url('影视.webp'); background-size: cover; background-position: center;">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="relative z-10">
+                            <h4 class="text-xl font-bold">影视概念</h4>
+                            <p class="text-sm">充满故事感的电影级画面</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- 聊天容器 - 移除px-4，保持完整宽度 -->
+            <div id="chat-container" class="flex-1 w-full max-w-3xl space-y-6 overflow-y-auto custom-scrollbar mt-6">
+                <!-- 聊天消息将通过 JavaScript 动态添加到这里 -->
+            </div>
+        </main>
+
+        <!-- 持续对话输入栏 -->
+        <div id="bottom-chat-bar" class="fixed bottom-0 left-0 w-full bg-transparent hidden animate-fade-in">
+            <div class="max-w-3xl mx-auto p-4">
+                <div class="relative bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-2xl">
+                    <form id="main-chat-form" class="w-full flex items-end gap-2 p-2">
+                        <textarea id="main-message-input" class="flex-1 p-2 bg-transparent focus:outline-none resize-none custom-scrollbar" placeholder="输入消息..." rows="1"></textarea>
+                        
+                        <button id="stop-button" type="button" class="flex-shrink-0 flex items-center justify-center w-28 h-10 bg-gray-200 text-gray-700 rounded-lg hidden">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            停止生成
+                        </button>
+                        <button id="main-submit-button" type="submit" class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:from-gray-400 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+// --- DOM Elements ---
+const initialView = document.getElementById('initial-view');
+const chatContainer = document.getElementById('chat-container');
+const initialChatForm = document.getElementById('initial-chat-form');
+const mainChatForm = document.getElementById('main-chat-form');
+const initialMessageInput = document.getElementById('initial-message-input');
+const mainMessageInput = document.getElementById('main-message-input');
+const bottomChatBar = document.getElementById('bottom-chat-bar');
+const stopButton = document.getElementById('stop-button');
+const mainSubmitButton = document.getElementById('main-submit-button');
+const tabButtons = document.querySelectorAll('.tab-btn');
+const promptButtons = document.querySelectorAll('.prompt-btn');
+
+let abortController = new AbortController();
+
+// --- Event Listeners ---
+
+// Handle initial form submission
+initialChatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = initialMessageInput.value.trim();
+    if (message) {
+        handleNewMessage(message);
+        initialMessageInput.value = '';
+    }
+});
+
+// Handle main form submission
+mainChatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = mainMessageInput.value.trim();
+    if (message) {
+        handleNewMessage(message);
+        mainMessageInput.value = '';
+        mainMessageInput.style.height = 'auto'; // Reset height
+    }
+});
+
+// Auto-resize textarea
+mainMessageInput.addEventListener('input', () => {
+    mainMessageInput.style.height = 'auto';
+    mainMessageInput.style.height = (mainMessageInput.scrollHeight) + 'px';
+});
+
+// Handle tab switching
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('tab-active'));
+        button.classList.add('tab-active');
+        const placeholderMap = {
+            '旅游规划': '规划一次三天两夜的桂林之旅...',
+            '设计商品': '设计一款以壮族元素为灵感的茶杯...',
+            '照片创作': '生成一张赛博朋克风格的城市夜景照片...'
+        };
+        initialMessageInput.placeholder = placeholderMap[button.textContent] || '输入你的想法...';
+    });
+});
+
+// Handle quick prompt buttons
+promptButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const promptText = button.textContent;
+        initialMessageInput.value = promptText;
+        initialMessageInput.focus();
+    });
+});
+
+// Stop generation button
+stopButton.addEventListener('click', () => {
+    abortController.abort();
+    console.log("Stream stopped by user.");
+});
+
+// --- Core Functions ---
+
+function handleNewMessage(message) {
+    if (initialView.style.display !== 'none') {
+        initialView.style.display = 'none';
+        bottomChatBar.style.display = 'block';
+    }
+    appendMessage(message, 'user');
+    fetchAIResponse(message);
+}
+
+function fetchAIResponse(message) {
+    toggleButtons(true);
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const aiMessageWrapper = appendMessage('', 'ai');
+    const contentElement = aiMessageWrapper.querySelector('.message-content');
+
+    fetch('/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message }),
+        signal,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        processStream(response.body, contentElement);
+    })
+    .catch(error => {
+        if (error.name === 'AbortError') {
+            finalizeMessage(contentElement);
+        } else {
+            console.error('Error during chat processing:', error);
+            contentElement.innerHTML = "抱歉，连接服务器时发生错误。";
+        }
+        toggleButtons(false);
+    });
+}
+
+async function processStream(stream, contentElement) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let fullResponse = "";
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.substring(6);
+                    if (data === '[DONE]') {
+                        continue;
+                    }
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (parsed.choices && parsed.choices[0].delta.content) {
+                            fullResponse += parsed.choices[0].delta.content;
+                        }
+                    } catch (e) {
+                       // Ignore parsing errors
+                    }
+                }
+            }
+            
+            contentElement.innerHTML = marked.parse(fullResponse + '<span class="blinking-cursor"></span>');
+            scrollToBottom();
+        }
+    } catch (error) {
+        console.error("Error reading stream:", error);
+        contentElement.textContent = "读取数据流时发生错误。";
+    } finally {
+        finalizeMessage(contentElement);
+        toggleButtons(false);
+    }
+}
+
+function appendMessage(content, sender) {
+    const messageWrapper = document.createElement('div');
+    const contentElement = document.createElement('div');
+    contentElement.className = 'message-content';
+    contentElement.innerHTML = marked.parse(content);
+
+    if (sender === 'user') {
+        messageWrapper.className = 'w-full flex justify-end px-4';
+        const messageBubble = document.createElement('div');
+        // 修复：改为max-w-2xl以匹配输入框宽度
+        messageBubble.className = 'max-w-2xl p-4 rounded-2xl bg-indigo-500 text-white';
+        messageBubble.appendChild(contentElement);
+        messageWrapper.appendChild(messageBubble);
+    } else { // AI sender
+        messageWrapper.className = 'w-full flex justify-start items-end gap-3 px-4';
+
+        // AI Icon
+        const iconWrapper = document.createElement('div');
+        iconWrapper.className = 'w-8 h-8 flex-shrink-0 mb-1';
+        iconWrapper.innerHTML = `
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 78C34.536 78 22 65.464 22 50C22 34.536 34.536 22 50 22C65.464 22 78 34.536 78 50C78 65.464 65.464 78 50 78Z" fill="url(#paint_ai_icon)"/>
+                <defs>
+                    <linearGradient id="paint_ai_icon" x1="22" y1="22" x2="78" y2="78" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#A78BFA"/><stop offset="1" stop-color="#F472B6"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        `;
+
+        const messageBubble = document.createElement('div');
+        // 修复：改为max-w-2xl以匹配输入框宽度
+        messageBubble.className = 'max-w-2xl p-4 rounded-2xl bg-white text-gray-800 shadow-sm';
+        
+        messageBubble.appendChild(contentElement);
+        messageWrapper.appendChild(iconWrapper);
+        messageWrapper.appendChild(messageBubble);
+    }
+    
+    chatContainer.appendChild(messageWrapper);
+    scrollToBottom();
+    return messageWrapper;
+}
+
+function finalizeMessage(contentElement) {
+    const cursor = contentElement.querySelector('.blinking-cursor');
+    if (cursor) {
+        cursor.remove();
+    }
+}
+
+function toggleButtons(isLoading) {
+    stopButton.style.display = isLoading ? 'flex' : 'none';
+    mainSubmitButton.style.display = isLoading ? 'none' : 'flex';
+}
+
+function scrollToBottom() {
+    requestAnimationFrame(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+}
+    </script>
+</body>
+</html>
