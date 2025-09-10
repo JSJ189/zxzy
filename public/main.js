@@ -150,12 +150,32 @@ function generateImage(prompt) {
         return response.json();
     })
     .then(data => {
-        if (data.data && data.data[0] && data.data[0].url) {
-            const imageUrl = data.data[0].url;
-            contentElement.innerHTML = `<img src="${imageUrl}" alt="生成的图像" class="generated-image">`;
+        // ==================== [核心修改] ====================
+        // 1. 检查返回的 data.data 是否是一个非空数组
+        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+            // 2. 创建一个容器来存放所有图片
+            const imageGridContainer = document.createElement('div');
+            imageGridContainer.className = 'generated-image-grid'; // 使用CSS网格布局
+
+            // 3. 遍历数组，为每张图片创建一个img标签
+            data.data.forEach(imageObject => {
+                if (imageObject.url) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageObject.url;
+                    imgElement.alt = '生成的图像';
+                    imgElement.className = 'generated-image';
+                    imageGridContainer.appendChild(imgElement);
+                }
+            });
+
+            // 4. 将整个容器放入消息内容区
+            contentElement.innerHTML = ''; // 清空"正在生成"的提示
+            contentElement.appendChild(imageGridContainer);
+
         } else {
             contentElement.innerHTML = "抱歉，未能从API获取有效图像链接。";
         }
+        // =====================================================
         scrollToBottom();
     })
     .catch(error => {
@@ -166,7 +186,6 @@ function generateImage(prompt) {
         toggleButtons(false);
     });
 }
-
 // 文本流处理
 async function processStream(stream, contentElement) {
     const reader = stream.getReader();

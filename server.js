@@ -57,44 +57,61 @@ app.post('/chat', async (req, res) => {
 
 
 // **图像生成接口已重构**
+// **图像生成接口已重构**
 app.post('/generate-image', async (req, res) => {
     console.log('--- 收到 /generate-image (图像模型) 请求 ---');
     const { prompt } = req.body;
     console.log('图像提示词:', prompt);
 
     const arkApiKey = process.env.ARK_API_KEY;
-
     if (!arkApiKey) {
         return res.status(500).json({ error: 'ARK_API_KEY 未在 .env 文件中设置' });
     }
 
-    // 初始化Ark客户端
-    const client = new OpenAI({
-        baseURL: "https://ark.cn-beijing.volces.com/api/v3",
-        apiKey: arkApiKey,
-    });
+    // API的URL地址
+    const url = "https://ark.cn-beijing.volces.com/api/v3/images/generations";
+
+    // 构造符合即梦4.0模型要求的请求体
+    const requestBody = {
+        model: "doubao-seedream-4-0-250828",
+        prompt: prompt,
+        size: "1024x1024",
+        response_format: "url",
+        // [核心修改] 使用顺序生成参数来请求4张图片
+        sequential_image_generation: "auto",
+        sequential_image_generation_options: {
+            max_images: 4
+        }
+    };
 
     try {
-        console.log('正在向火山方舟发送请求 (使用OpenAI兼容模式)...');
-        const response = await client.images.generate({
-            // **最终修正**: 修正了模型名称，加上了"doubao-"前缀
-            model: "doubao-seedream-3-0-t2i-250415", 
-            prompt: prompt,
-            size: "1024x1024",
-            n: 1,
-            response_format: "url"
+        console.log('正在向火山方舟发送 fetch 请求...');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${arkApiKey}`,
+            },
+            body: JSON.stringify(requestBody),
         });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('火山方舟 API 错误:', errorBody);
+            throw new Error(`API 错误: ${errorBody.error?.message || response.statusText}`);
+        }
+
+        const responseData = await response.json();
         
-        console.log('图像生成成功，返回结果:', response.data);
-        // 将返回的数据格式调整为前端期望的格式
-        res.json({ data: response.data });
+        console.log('图像生成成功，返回结果:', responseData.data);
+        // 直接将返回的数据传递给前端
+        res.json({ data: responseData.data });
 
     } catch (error) {
         console.error('图像生成出错:', error);
         res.status(500).json({ error: '生成图像时发生错误', details: error.message });
     }
 });
-
 
 app.listen(PORT, () => {
     console.log(`服务器已启动，正在监听 http://localhost:${PORT}`);
