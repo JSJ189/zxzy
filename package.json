@@ -1,13 +1,20 @@
 {
-"name": "zhuangxin-zhiyu",
-"version": "1.0.0",
-"description": "A simple chat application with streaming response.",
-"main": "server.js",
-"scripts": {
-"start": "node server.js"
-},
-"dependencies": {
-"express": "^4.19.2",
-"dotenv": "^16.4.5"
+  "name": "zxzy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@volcengine/openapi": "^1.0.17",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
 }
-}
+

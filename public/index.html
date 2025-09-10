@@ -35,6 +35,24 @@
             font-weight: 600;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
+        /* 新增：图像生成相关样式 */
+        .image-loading {
+            color: #6b7280;
+            padding: 20px;
+            text-align: center;
+        }
+        .generated-image-container {
+            margin: 10px 0;
+        }
+        .generated-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .generated-image:hover {
+            transform: scale(1.01);
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased">
